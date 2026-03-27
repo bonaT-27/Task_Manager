@@ -30,7 +30,7 @@ export class TaskRepository {
     if (!existingTask) {
       throw new Error('Task not found or access denied');
     }
-    
+
     return await prisma.task.update({
       where: { id },
       data,
@@ -42,7 +42,7 @@ export class TaskRepository {
     if (!existingTask) {
       throw new Error('Task not found or access denied');
     }
-    
+
     return await prisma.task.delete({
       where: { id },
     });
@@ -50,9 +50,9 @@ export class TaskRepository {
 
   async findByStatus(userId: string, status: TaskStatus): Promise<Task[]> {
     return await prisma.task.findMany({
-      where: { 
+      where: {
         userId,
-        status 
+        status,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -60,9 +60,9 @@ export class TaskRepository {
 
   async findByPriority(userId: string, priority: TaskPriority): Promise<Task[]> {
     return await prisma.task.findMany({
-      where: { 
+      where: {
         userId,
-        priority 
+        priority,
       },
       orderBy: { createdAt: 'desc' },
     });
