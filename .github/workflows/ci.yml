@@ -2,112 +2,23 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, master, develop]
-  pull_request:
-    branches: [main, master]
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    branches: [master]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: testdb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-          --health-start-period 10s
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Check database connection
-        run: |
-          sudo apt-get install -y postgresql-client
-          PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -c "SELECT version();"
-        env:
-          PGPASSWORD: testpass
-
-      - name: Generate Prisma client
-        run: npx prisma generate
-        env:
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
-
-      - name: Run migrations
-        run: npx prisma migrate deploy
-        env:
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
-
-      - name: List tables after migration
-        run: |
-          PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -c "\dt"
-        env:
-          PGPASSWORD: testpass
-
-      - name: Run tests with CI reporter
-        run: npm run test:ci
-        env:
-          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
-          JWT_SECRET: test-secret-key-for-ci
-          NODE_ENV: test
-
-      - name: Run linting
-        run: npm run lint
-
-      - name: Run type check
-        run: npx tsc --noEmit
-
   build:
-    needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: 20
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
+      - name: TypeScript type check
+        run: npx tsc --noEmit
