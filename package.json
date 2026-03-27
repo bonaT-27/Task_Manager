@@ -17,7 +17,8 @@
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "docker:up": "docker-compose up",
-    "docker:down": "docker-compose down"
+    "docker:down": "docker-compose down",
+    "type-check:src": "tsc --noEmit --project tsconfig.build.json"
   },
   "keywords": [
     "task",
