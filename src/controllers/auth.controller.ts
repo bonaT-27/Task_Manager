@@ -39,11 +39,7 @@ export const login = async (
   }
 };
 
-export const getCurrentUser = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const getCurrentUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const user = await authService.getCurrentUser(req.userId!);
     res.json(user);
