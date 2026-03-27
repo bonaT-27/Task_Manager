@@ -16,7 +16,7 @@ export class AuthService {
 
     // Hash password
     const hashedPassword = await hashPassword(data.password);
-    
+
     // Create user
     const user = await this.userRepository.create({
       ...data,
