@@ -1,40 +1,24 @@
 {
   "name": "task-management-api",
   "version": "1.0.0",
-  "description": "Production-ready Task Management API with Express, TypeScript, and Prisma",
+  "description": "Task Management API with Express, TypeScript, and Prisma",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn src/server.ts",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node prisma/seed.ts",
-    "prisma:studio": "prisma studio",
-    "test": "vitest",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
-    "lint": "eslint src --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "docker:up": "docker-compose up",
-    "docker:down": "docker-compose down",
-    "type-check:src": "tsc --noEmit --project tsconfig.build.json"
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:seed": "ts-node prisma/seed.ts"
   },
-  "keywords": [
-    "task",
-    "api",
-    "express",
-    "typescript",
-    "prisma",
-    "postgresql"
-  ],
-  "author": "",
-  "license": "MIT",
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
-    "cors": "^2.8.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
     "helmet": "^7.2.0",
@@ -44,22 +28,13 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.25",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.19.37",
-    "@types/supertest": "^7.2.0",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "@vitest/coverage-v8": "^1.6.1",
-    "eslint": "^8.57.1",
-    "prettier": "^3.8.1",
     "prisma": "^5.22.0",
-    "supertest": "^7.2.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3",
-    "vitest": "^1.6.1"
+    "typescript": "^5.9.3"
   }
 }
