@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,9 +6,13 @@ on:
   pull_request:
     branches: [main, master]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
@@ -24,6 +28,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+          --health-start-period 10s
 
     steps:
       - name: Checkout code
@@ -38,6 +43,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check database connection
+        run: |
+          sudo apt-get install -y postgresql-client
+          PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -c "SELECT version();"
+        env:
+          PGPASSWORD: testpass
+
       - name: Generate Prisma client
         run: npx prisma generate
         env:
@@ -48,11 +60,17 @@ jobs:
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
 
-      - name: Run tests
-        run: npm test
+      - name: List tables after migration
+        run: |
+          PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -c "\dt"
+        env:
+          PGPASSWORD: testpass
+
+      - name: Run tests with CI reporter
+        run: npm run test:ci
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
-          JWT_SECRET: test-secret
+          JWT_SECRET: test-secret-key-for-ci
           NODE_ENV: test
 
       - name: Run linting
@@ -65,6 +83,8 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
