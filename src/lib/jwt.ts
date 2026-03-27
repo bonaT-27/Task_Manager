@@ -9,20 +9,19 @@ export const generateToken = (userId: string): string => {
     expiresIn: JWT_EXPIRES_IN as SignOptions['expiresIn'],
   };
   
-  return jwt.sign(payload, JWT_SECRET, options);
+  const token = jwt.sign(payload, JWT_SECRET, options);
+  console.log('Generated token for user:', userId); // Debug log
+  return token;
 };
 
 export const verifyToken = (token: string): { userId: string } => {
   try {
+    console.log('Verifying token:', token); // Debug log
     const decoded = jwt.verify(token, JWT_SECRET);
+    console.log('Decoded token:', decoded); // Debug log
     return decoded as { userId: string };
   } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      throw new Error('Token has expired');
-    }
-    if (error instanceof jwt.JsonWebTokenError) {
-      throw new Error('Invalid token');
-    }
-    throw new Error('Token verification failed');
+    console.error('Token verification failed:', error);
+    throw new Error('Invalid or expired token');
   }
 };
