@@ -17,7 +17,7 @@ export const errorHandler = (
   err: AppError | Error,
   req: Request,
   res: Response,
-  _next: NextFunction  // Prefix with underscore to indicate intentionally unused
+  _next: NextFunction // Prefix with underscore to indicate intentionally unused
 ) => {
   const statusCode = err instanceof AppError ? err.statusCode : 500;
   const message = err.message || 'Internal Server Error';
