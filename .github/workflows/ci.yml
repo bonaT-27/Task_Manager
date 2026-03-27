@@ -2,12 +2,12 @@ name: CI/CD
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [master, develop]
   pull_request:
     branches: [main, master]
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # Force Node.js 24 for actions
 
 jobs:
   test:
@@ -27,7 +27,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          --health-start-period 10s
 
     steps:
       - name: Checkout code
@@ -36,7 +35,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20'  # Keep Node 20 for runtime, only actions use Node 24
           cache: 'npm'
 
       - name: Install dependencies
@@ -52,8 +51,8 @@ jobs:
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests with verbose output
+        run: npm test -- --reporter=verbose
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
           JWT_SECRET: test-secret-key
@@ -62,10 +61,8 @@ jobs:
       - name: Run linting
         run: npm run lint
 
-      - name: Run type check (source only)
-        run: npm run type-check:src
-        env:
-          NODE_ENV: test
+      - name: Run type check
+        run: npx tsc --noEmit
 
   build:
     needs: test
