@@ -22,6 +22,7 @@ echo "Checking environment variables..."
 echo "DATABASE_URL: $([ -n "$DATABASE_URL" ] && echo "✅ Set" || echo "❌ NOT SET")"
 echo "JWT_SECRET: $([ -n "$JWT_SECRET" ] && echo "✅ Set" || echo "❌ NOT SET")"
 echo "PORT: ${PORT:-3000}"
+echo "NODE_ENV: ${NODE_ENV:-not set}"
 
 echo "Running database migrations..."
 if [ -n "$DATABASE_URL" ]; then
