@@ -2,6 +2,9 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Install OpenSSL 3.0
+RUN apk add --no-cache openssl3
+
 # Copy package files
 COPY package*.json ./
 COPY prisma ./prisma/
@@ -9,7 +12,7 @@ COPY prisma ./prisma/
 # Install dependencies
 RUN npm ci
 
-# Generate Prisma client
+# Generate Prisma client with the correct binary target
 RUN npx prisma generate
 
 # Copy source code
@@ -23,8 +26,8 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install openssl for Prisma and curl for healthcheck
-RUN apk add --no-cache openssl curl
+# Install OpenSSL 3.0 and curl for healthcheck
+RUN apk add --no-cache openssl3 curl
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
@@ -39,10 +42,9 @@ RUN chmod +x start.sh
 # Expose port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+# Health check with longer timeout
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
   CMD curl -f http://localhost:3000/health || exit 1
 
-
-# Migrations, example seed row, then API (Railway / Compose)
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node dist/server.js"]
+# Migrations, then start the API (Railway / Compose)
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
